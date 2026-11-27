@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealBeacon — Real Black Friday 2026 Deals, Checked Today</title>
+<meta name="description" content="DealBeacon checks real Black Friday 2026 deals at Amazon, Best Buy, Walmart and Target: sale price, usual price, discount, check time and an honest verdict on every deal.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101c33'/%3E%3Cpolygon points='16,6 26,16 16,26 6,16' fill='%23f5a623'/%3E%3C/svg%3E">
+<script type="module" src="main.js"></script>
+</head>
+<body>
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">&#9670;</span>
+      <div>
+        <h1>DealBeacon</h1>
+        <p class="tagline">Real Black Friday deals, checked today — not red-sticker prices.</p>
+      </div>
+    </div>
+    <div class="masthead-meta">
+      <p><strong>Black Friday 2026</strong> · Fri 27 Nov – Cyber Monday 30 Nov</p>
+      <p>Prices checked <strong>27 Nov 2026, 06:15–06:25 UTC</strong></p>
+    </div>
+  </div>
+</header>
+
+<section class="stats" id="stats" aria-label="Sale summary"></section>
+
+<section class="controls" aria-label="Search and filters">
+  <div class="search-row">
+    <label class="search-box">
+      <span class="search-icon" aria-hidden="true">&#8981;</span>
+      <input id="search" type="search" placeholder="Search deals — try “airpods”, “OLED”, “lego”…" autocomplete="off">
+    </label>
+    <label class="sort-box">Sort
+      <select id="sort">
+        <option value="best">Best deal first</option>
+        <option value="discount">Biggest % off</option>
+        <option value="saving">Biggest saving ($)</option>
+        <option value="price-low">Lowest price</option>
+        <option value="price-high">Highest price</option>
+      </select>
+    </label>
+  </div>
+  <div class="filter-row" id="category-filters" role="group" aria-label="Filter by category"></div>
+  <div class="filter-row" id="store-filters" role="group" aria-label="Filter by store"></div>
+  <div class="filter-row">
+    <span class="filter-label">Min. discount</span>
+    <div class="chip-group" id="discount-filters" role="group" aria-label="Filter by minimum discount"></div>
+    <span class="filter-label">Verdict</span>
+    <div class="chip-group" id="signal-filters" role="group" aria-label="Filter by verdict"></div>
+  </div>
+  <p class="result-line" id="result-line"></p>
+</section>
+
+<section class="compare" id="compare" aria-label="Same product at several stores"></section>
+
+<main>
+  <div class="deal-grid" id="deal-grid"></div>
+  <p class="empty" id="empty" hidden>No deals match. Clear the search or a filter to see the full board.</p>
+</main>
+
+<section class="method" aria-label="How deals are checked">
+  <h2>How every deal was checked</h2>
+  <p>Each price on this page was read on 27 November 2026 from a deals source that names the store — Mashable's Black Friday 2026 guide, Best Buy's 17 November Black Friday release, Walmart's Black Friday event pages, and Target's Black Friday event (via MacRumors). The sale price, usual price and discount are shown together so the maths can be checked, and every deal carries a verdict: <strong>New low</strong> is the lowest price tracked for that item, <strong>Strong deal</strong> is a genuinely good cut, and <strong>Routine sale</strong> is a small or everyday-style cut. Where the same product is on sale at more than one store, the compare strip above shows the cheapest store first. Prices move during the sale — tap “View at store” to confirm before buying.</p>
+</section>
+
+<footer>
+  <p>DealBeacon is an independent deal finder. Prices in US dollars, checked 27 Nov 2026, 06:15–06:25 UTC. Store links open the product search at that store.</p>
+</footer>
+</body>
+</html>
