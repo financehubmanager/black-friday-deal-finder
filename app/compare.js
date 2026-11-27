@@ -2,7 +2,7 @@
 // cheapest first, so a shopper can see at a glance where to buy it.
 
 import { DEALS } from "./deals.js";
-import { money } from "./signals.js";
+import { discountPct, money } from "./signals.js";
 
 /** Groups with more than one store, best price first. */
 export function compareGroups() {
@@ -26,7 +26,8 @@ export function compareCardHTML(group) {
   const rows = group.rows.map((deal, i) => {
     const cls = i === 0 ? "best" : "worse";
     const tag = i === 0 ? " <span class=\"best\">cheapest</span>" : "";
-    return `<div class="compare-row"><span class="${cls}">${deal.store}${tag}</span><span class="${i === 0 ? "best-price" : "worse"}">${money(deal.price)}</span></div>`;
+    const off = i === 0 ? ` <span class="compare-off">−${discountPct(deal)}%</span>` : "";
+    return `<div class="compare-row"><span class="${cls}">${deal.store}${tag}</span><span class="${i === 0 ? "best-price" : "worse"}">${money(deal.price)}${off}</span></div>`;
   }).join("");
   return `<article class="compare-card"><h3>${group.title}</h3>${rows}</article>`;
 }
