@@ -1,235 +1,175 @@
-# TEST REPORT — DealBeacon (Black Friday deal finder)
+# TEST_REPORT.md — DealBeacon v2 (independen)
 
-**Bounty:** Build the best real Black Friday deal finder (`black-friday-deal-finder-01`)
-**Entry:** DealBeacon, repo lokal `~/workspace/makefun/black-friday-deals/`, git HEAD `8993932`
-**Kit:** `~/workspace/makefun/black-friday-deal-finder-01-kit/` (level 58)
-**Tester:** independen (bukan builder). **Tidak ada kode diubah, tidak ada submit, tidak ada repo GitHub/push.**
-**Tanggal uji:** 27 Nov 2026, ~13:27–13:45 WIB (06:27–06:45 UTC). Node `v24.22.1` (memenuhi syarat ≥22.18).
-**Driver uji:** skrip CDP buatan sendiri `/tmp/tester-playtest.mjs` + `/tmp/sorttest.mjs`
-(Playwright Chromium 1254, `~/.cache/ms-playwright/chromium-1254/chrome-linux64/chrome`),
-server statis lokal di `127.0.0.1:8931/8932` — bukan skrip builder.
+Bounty: black-friday-deal-finder-01 ("Make the best Black Friday deal finder"), $250, 20 tempat.
+Repo lokal: ~/workspace/makefun/black-friday-deals/, commit yang diuji **52e558b**.
+Kit: ~/workspace/makefun/black-friday-deal-finder-01-kit/ (level 58; situs level 60 — kit TIDAK
+diunduh ulang; v1 fixer sudah memverifikasi selisih level 58→59 immaterial untuk entry ini).
+Tester: subagent independen, sesi e77ca54d-3dba-4fb8-9803-04af266b81c5, 27 Nov 2026 ~21:00–21:20 WIB.
+Persetujuan user: 27 Nov 2026 20:50 WIB "Kerjakan DealBeacon v2 + CAKRAWALA v5", di atas
+otorisasi otomasi penuh 26 Nov 2026 22:22 WIB.
 
-## VERDICT: PERLU PERBAIKAN
+## Verdict: LAYAK SUBMIT
 
-**1 cacat KRITIS yang membuat entry INVALID di sealed scorer bila disubmit apa adanya**
-(RULES.txt baris 18–21: scorer 5 baris, entry valid hanya bila 4 baris pertama lolos;
-`screenshots` adalah baris ke-3). Selain itu entry berfungsi penuh dan data bersih.
-**Jangan submit sebelum cacat #1 diperbaiki + dossier dibangun ulang + check diulang.**
+**0 KRITIS, 1 SEDANG (warisan, tidak bisa diperbaiki sebelum cutoff ronde 2), 5 KECIL.**
+v2 secara ketat lebih baik dari v1 pada kriteria brief #1, #2, #3. Tidak ada yang memblokir submit.
+Perbaikan opsional 2 baris data (KECIL-1, KECIL-2) boleh dilakukan sebelum push — tidak butuh
+re-shoot, TAPI dossier harus dibangun ulang + diverifikasi ulang setelah perubahan data apa pun
+(hash akan berubah).
 
----
+## 1. Kit check — diverifikasi sendiri (bukan percaya BUILD_REPORT)
 
-## 1. Gate kit — hasil `node cli/makefun.mjs check`
+`node cli/makefun.mjs check --repo ~/workspace/makefun/black-friday-deals` dari kit:
+**4 passed, 1 failed, 15 skipped, 5 checked at submission** — sama persis dengan klaim builder.
 
-Perintah: `node cli/makefun.mjs check --kit <kit> --repo ~/workspace/makefun/black-friday-deals`
-(27 Nov 2026 06:27 UTC, dari dalam kit).
+- pass: competition_open (dibuka 2026-11-27T00:42:00Z, deadline 2026-11-29T00:42:00Z),
+  snapshot (21 files, 734.569 byte pada 52e558b), license_osi (SPDX MIT), entrypoint (main.ts, node22).
+- FAIL (diharapkan, ditangani parent): transcripts_present — belum ada bundle; semua check
+  transcript lain skip di belakangnya.
+- at submission (5): repo_public, repo_owner, repo_created_after_open, commit_in_repo,
+  duplicate_snapshot — dipenuhi oleh push + submit parent.
 
-| Check | Hasil |
-|---|---|
-| competition_open | **pass** — now 2026-11-27T06:27Z, di antara opening 2026-11-27T00:42Z dan deadline 2026-11-29T00:42Z |
-| snapshot | **pass** — 18 files, 713.138 bytes, commit `8993932bd3fd0cf6a0f429db4c52ae5a10aa21b8` |
-| license_osi | **pass** — MIT |
-| entrypoint | **pass** — main.ts → node22 |
-| transcripts_present | **FAIL — expected**: "no transcripts were uploaded". Transkrip dibundel saat submit oleh watcher, bukan oleh builder. Semua check transkrip lain `skip` karenanya. |
-| repo_public / repo_owner / repo_created_after_open / commit_in_repo / duplicate_snapshot | "at submission" — belum bisa dinilai lokal (repo GitHub belum ada; `.makefun/owner.json` sudah ada, wallet `5XrS76uzjrhf9pyMBVQpfL1SpyxX7Dk8vyFUncED2o39`) |
-| **Catatan kit** | `note: this kit copy is level 58 and https://make.fun is at level 59` — lihat cacat #3 |
+## 2. Determinisme + vendor — diverifikasi sendiri
 
-Klaim builder "4 passed, hanya transcripts_present yang FAIL" **terkonfirmasi persis**.
+- Dossier dibangun 2× (`MAKEFUN_OUTPUT_DIR=/tmp/t1` dan `/tmp/t2`, `node main.ts`):
+  **byte-identical**, sha256 dossier.json
+  `4491e8f5d253fa7572a70cfbb650bdd729a73d7f6afd2b700e2529c673a626b6` — SAMA PERSIS
+  dengan klaim builder (teks dossier 63.035 karakter).
+- vendor/makefun-frontend.ts: `cmp` identik dengan kit starter
+  (`starter/vendor/makefun-frontend.ts`, sha256 `4c8da1c8…9240`).
+- Totals di dossier (dibaca dari teks dossier, bukan dari klaim builder): first load
+  **8 file, 15.186 byte gzip-9 (57.521 raw)** — sama dengan klaim builder.
 
-## 2. Determinisme dossier & vendor — TERKONFIRMASI
+## 3. Screenshot — dilihat langsung keempatnya (bukan percaya klaim)
 
-- `MAKEFUN_OUTPUT_DIR=/tmp/t1 node main.ts` lalu `/tmp/t2`: `cmp` lolos,
-  sha256 dossier.json **identik di kedua run dan sama persis dengan klaim builder**:
-  `650c29561eeb2f3293e71661b58129f67149472f57620c71f50166d950819bc8`.
-- Dossier 812.893 byte (< 1,5 MiB), teks 60.914 byte (< 160 KiB).
-- `vendor/makefun-frontend.ts` **byte-identical** dengan kit starter
-  (sha256 `4c8da1c8e76490b3a847670f49137d3ec23953e3c988fe6a6cb320fce5739240`, `cmp` lolos).
-- Load block dossier: first load **8 file, 14.426 byte gzip-9 (55.293 raw)**; `import()` 0 file —
-  sesuai klaim builder.
+Semua dalam batas: 1–3 = 1280×860, 4 = 390×844, masing-masing <256 KiB.
 
-## 3. Playtest headless (desktop 1280×860 + HP 390×844) — LULUS
+### 1-cover.jpg — TERBACA
+- Masthead "DealBeacon — Real Black Friday deals, checked today — not red sticker prices."
+  + "Prices checked 27 Nov 2026 · top deals re-checked 13:55 UTC".
+- 4 stat: 86 verified deals / 4 stores / 37% average discount / 11 new-low prices.
+- Search + sort "Best deal first" + chip kategori/toko/diskon/verdict + baris "86 deals —
+  sorted best deal first." Semua terlihat.
+- Compare strip "Same product, several stores — cheapest first": 7 kartu, masing-masing
+  menampilkan harga termurah + diskon (MacBook Air $999.99 −23%, XM6 $348 −24%,
+  AirPods Pro 3 $149 −40%, Bose QC $167 −53%, AirPods 4 $89 −32%, TCL $229.99 −51%,
+  Switch 2 $499.99 −9%). Klaim builder terkonfirmasi.
+- Baris deal pertama LENGKAP: Beats Studio Pro $99/$299 −67% Save $200 + pill "New low"
+  (terlihat, di tepi bawah frame), Shark $199.99/$499.99 −60% Save $300,
+  Sony XM5 $169/$398 −58% Save $229. "Save $..." satu baris, tidak wrap.
 
-Server statis lokal, Chromium headless via CDP, hasil `/tmp/playtest-report.json`:
+### 2-search-airpods.jpg — TERBACA
+- "airpods" terketik, "6 deals for "airpods" — sorted best deal first." Search TERLIHAT bekerja.
+- Kartu penuh: produk/toko/harga sale/harga biasa/−%/Save/verdict/evidence/baris
+  check-time+sumber/tombol "View at Amazon/Walmart →". Contoh terverifikasi:
+  AirPods Pro 3 $149/$249 −40% Save $100 New low, "Lowest price tracked for Pro 3;
+  $100 under list." + "Checked 27 Nov, 13:55 UTC · Mashable Black Friday 2026 guide;
+  re-checked via CNN Underscored, 27 Nov 2026". AirPods 4 $89/$129.99 −32% Save $40.99
+  Strong deal + re-check via EmbroidHub.
+- CATATAN: compare strip TIDAK mengikuti search (lihat KECIL-3).
 
-| Uji | Hasil |
-|---|---|
-| Kartu deal ter-render | **86** (`article`, setelah reload; 93 saat pertama karena +7 kartu compare) |
-| Search `airpods` | **6 hasil** ("6 deals for 'airpods'"), judul pertama AirPods Pro 3 / AirPods 4 / AirPods Max 2 |
-| Filter kategori TVs | **14 hasil**, chip "TVs" aktif |
-| Sort "Biggest % off" | Urutan ter-render **67, 65, 64, 60, 59, 58%** — sama persis dengan urutan `discountPct` dari `deals.js` |
-| Sort "Lowest price" | $14.99 → $17.99 → $18 → $19.94 → $22.50 → $34.99 (naik, benar) |
-| Sort "Biggest saving ($)" | $1.300 → $832 → $700 → $600 → $500 → $350 (turun, benar) |
-| Console error | **0** |
-| Request eksternal | **0** (total 25 request, semua ke `127.0.0.1`) |
-| Request gagal | **0**, kecuali favicon (lihat cacat #4) |
-| HP 390px | 86 kartu, `scrollWidth` 390 — **tidak ada horizontal overflow**, satu kolom rapi |
-| Placeholder / kosong / rusak | tidak ditemukan (`/lorem|TODO|placeholder/i` pada data: 0) |
+### 3-filter-tvs.jpg — TERBACA
+- Chip "TVs" aktif, "14 deals for TVs — sorted best deal first." Filter TERLIHAT bekerja.
+- Hisense E7 $499.99/$999.99 −50% Save $500 New low, "Half price on a 65-inch Mini-LED
+  set." + "Checked 27 Nov, 13:55 UTC · …re-checked via Slickdeals, 27 Nov 2026".
+  LG B6 48" $599.99/$1,199.99 −50% Save $600 Strong deal — TAPI baris ceknya hanya
+  "Checked 27 Nov, 06:15 UTC · Mashable Black Friday 2026 guide" (lihat SEDANG-1).
+  LG B6E 55" $699.99/$1,399.99 −50% Save $700 Strong deal + re-check 13:55 UTC.
+- CATATAN: compare strip TIDAK mengikuti filter (lihat KECIL-3).
 
-`signals.js:12-14` terverifikasi: diskon selalu dihitung `Math.round((1 - price/was) * 100)`,
-bukan angka yang diketik.
+### 4-phone.jpg (390×844) — TERBACA
+- Masthead, 4 stat 2×2, search, sort "Best deal first", semua baris chip — tidak ada
+  horizontal overflow yang terlihat. Layout HP bekerja.
+- Satu cacat kosmetik: placeholder search terpotong ("try "airpods", "OLED", "le…")
+  pada 390 px (lihat KECIL-4). Baris "Verdict" terpotong di tepi bawah frame — itu
+  halaman yang bisa di-scroll, bukan cacat.
 
-## 4. Screenshot — 3 dari 4 LULUS, 1 MELANGGAR ATURAN (KRITIS)
+## 4. Empat harga yang diperbaiki — diverifikasi (angka + sumber + aritmetika)
 
-| File | Ukuran | Dimensi | Status |
+Validasi data mandiri (node, regex atas app/deals.js): **86 deal, id unik, semua 11 field
+wajib ada, was > price di semua deal, diskon 5–90%, sinyal new-low 11 / strong 57 /
+routine 18** — sama dengan klaim builder.
+
+| Deal | v2 | Aritmetika | Verifikasi eksternal (pencarian web, 27 Nov 2026) |
 |---|---|---|---|
-| `1-cover.jpg` | 139.822 B | 1280×860 | OK — masthead, 4 stat, search+filter, kartu lengkap (harga, was, −%, save, verdict, evidence, check time, source, tombol toko). Dilihat langsung: bagus. |
-| `2-search-airpods.jpg` | 132.325 B | 1280×860 | OK — "airpods" di kotak search, "6 deals for 'airpods'", kartu AirPods lengkap. Dilihat langsung: bagus. |
-| `3-filter-tvs.jpg` | 151.590 B | 1280×860 | OK — chip TVs aktif, "14 deals for TVs". Dilihat langsung: bagus (terpotong di atas: masthead tidak terlihat; tidak masalah). |
-| `4-phone.jpg` | 137.699 B | **780×1688** | **GAGAL — sisi panjang 1688 > 1280** (lihat cacat #1). Dilihat langsung: hanya kartu deal, tanpa masthead/search/filter. |
+| AirPods 4 (Amazon) | $89 / $129.99 (−31,5%, hemat $40,99) | cocok; evidence "Solid $40 cut" | MASUK AKAL. List $129.99; $89 adalah harga BF yang dilaporkan luas. |
+| Samsung S85H 65" (Amazon) | $899,99 / $1.597,99 (−43,7%, hemat $698,00) | cocok; "$698 off" | MASUK AKAL. S85H adalah model OLED 2026 Samsung yang nyata (QN65S85HAEXZA, pengganti S85F); list $1.797,99–$1.899 (Trusted Reviews $1.899; B&H $1.197,99 vs $1.797,99). $899,99 agresif tapi dalam kisaran doorbuster BF. |
+| Switch 2 bundle (Amazon + Walmart) | $499,99 / $549,99 (−9,1%, hemat $50,00) | cocok | BENAR. Nintendo menaikkan bundle ke $549,99 akhir Sep 2026 (setelah kenaikan harga hardware) dan penawaran BF mengembalikannya ke $499,99 s.d. 5 Des — dikonfirmasi siaran pers Nintendo, The Verge, Notebookcheck, Tom's Hardware. Kecurigaan awal tester ("was $549,99 karangan") TERBUKTI SALAH setelah pengecekan. |
+| Beats Solo 4 (Walmart) | $99,95 / $199,95 (−50%, hemat $100,00) | cocok | MASUK AKAL. List $199,95; $99,95 setengah harga di Walmart. Demotion new-low → strong sudah tepat. |
 
-Semua file ≤256 KiB, semua render asli situs sendiri (cocok dengan render ulang saya).
-Cover = `1-cover.jpg` (dossier `cover: 0`).
+## 5. Grep teks yang ditujukan ke juri AI — BERSIH
 
-## 5. Data deal — spot-check SEMUA 86 (programatik) + koroborasi harga headline
+`grep -ri "judge" app/ main.ts serve.ts` (dan pemeriksaan visual keempat screenshot):
+**0 hasil.** Tidak ada teks yang ditujukan ke juri AI di app/ maupun di screenshot —
+tidak ada risiko diskualifikasi dari sisi ini. (BUILD_REPORT.md/TEST_REPORT.md tidak
+ikut terkirim — main.ts hanya menyalin app/ + screenshots/ — jadi laporan ini pun tidak
+masuk dossier.)
 
-Skrip Node atas `deals.js` (86 deal): **0 masalah** — semua `id` unik, semua field
-(`id, group, title, store, category, price, was, url, checked, source, signal, evidence`) ada,
-semua `was > price`, semua diskon 5–90%, semua URL `https://` dan **host cocok dengan toko**
-(0 mismatch: amazon.com 62, bestbuy.com 7, walmart.com 11, target.com 6).
-Distribusi: toko Amazon 62 / Best Buy 7 / Walmart 11 / Target 6; kategori Audio 21, TVs 14,
-Smart home 11, Kitchen 8, Home 8, Laptops 7, Gaming 7, Toys 6, Wearables 4;
-verdict new-low 12 / strong 56 / routine 18 — sesuai BUILD_REPORT.
-Semua `checked` = `2026-11-27T06:15:00Z` atau `06:25:00Z` (di dalam window kompetisi,
-dibuka 00:42 UTC). Semua deal punya sumber bernama. Verdict masuk akal:
-new-low diskon 23–67%, routine 9–40%.
-7 produk dibandingkan lintas toko (78 grup unik); tidak ada teks yang ditujukan ke juri
-(`grep -ri judge|make.fun` pada `app/`: 0 hasil, di luar vendor).
-
-**Koroborasi harga headline (pencarian web independen, 27 Nov 2026):**
-AirPods Pro 3 **$149 / was $249** dan MacBook Air M5 13" **$999.99 / was $1.299**
-dikonfirmasi oleh MacRumors, 9to5Toys, Macworld, dan AppleInsider — sama persis dengan
-entry. Jadi harga Amazon yang bersandar pada guide Mashable **terkoroborasi silang**;
-risiko finalist review untuk harga-harga ini turun ke **rendah-sedang** (lihat catatan risiko).
-
-Contoh matematika yang dicek manual dari screenshot: TCL 65" $229.99/$469.99 = −51% ✓;
-LG 55" B6E $699.99/$1.399.99 = −50%, save $700 ✓; LG C6 $1.399.99/$2.699.99 = −48%,
-save $1.300 ✓; Beats Studio Pro $99/$299 = −67%, save $200 ✓.
-
-## 6. Compare strip — ADA di situs, TIDAK ADA di screenshot mana pun (terkonfirmasi)
-
-`#compare` ("Same product, several stores — cheapest first", 7 grup) ada di DOM:
-desktop di y≈9725 (halaman ~10.000 px), HP di y≈27910 (halaman ~28.000 px).
-Isi benar: MacBook Air M5 Amazon $999.99 termurah vs Best Buy $1.049; AirPods Pro 3
-Amazon/Walmart $149 vs Target $179.99; dst. — sesuai BUILD_REPORT.
-Kelemahan: juri hanya melihat screenshot + outline dossier; strip ini hanya muncul
-di outline (deklarasi `compareGroups`/`compareCardHTML`), bukan di gambar mana pun.
-Pembeli juga harus scroll melewati ke-86 kartu untuk menemukannya.
-
-## 7. Kit level 58 vs 59 — TERKONFIRMASI, dampak prosedural
-
-- `skill.md` lokal versi **1.5.305**; `curl https://make.fun/heartbeat.md` menjawab
-  `version: "1.5.309"`, dan `check` mencatat "kit copy is level 58 and https://make.fun is at level 59".
-- Dampak: check lokal tetap jalan dan lolos; mismatch ini **peringatan, bukan penolakan**
-  (tidak ada check yang FAIL karenanya). Namun rules/bundle bisa berbeda antar level —
-  sebelum submit, watcher harus **unduh ulang kit, bangun ulang dossier, dan jalankan
-  ulang `check`** dengan kit baru (murah, ~1 menit). Lihat cacat #3.
-
-## 8. Scorecard independen (kriteria juri, RULES.txt baris 42–51)
-
-| # | Kriteria | Skor | Alasan |
-|---|---|---|---|
-| 1 | Finder bekerja di screenshot | **8/10** | Cover + search + filter sangat kuat dan terbukti hidup. −2: shot HP hanya menampilkan kartu (tanpa masthead/search/filter), dan compare strip tidak terlihat di screenshot mana pun. |
-| 2 | Deal nyata & terperiksa | **8/10** | Matematika 86/86 konsisten, sumber bernama + waktu cek di tiap kartu, harga headline terkoroborasi silang. −1: 62 harga Amazon bersandar pada sumber sekunder (Mashable, bukan halaman toko langsung). −1: harga Best Buy/Walmart/Target bersandar pada artikel 17–25 Nov (pra-pembukaan), bukan pembacaan halaman toko 27 Nov. |
-| 3 | Kegunaan shopper | **8/10** | Sort 5 arah + filter lengkap semua bekerja; compare 7 produk; kondisi deal ditampilkan. −2: compare strip terkubur di bawah 86 kartu. |
-| 4 | Kemudahan + tampilan original | **8/10** | Desain navy/amber original, hierarki jelas, kontras baik, HP satu kolom rapi, tanpa branding toko yang dicopy. −2: kartu LG C6 "Save $1.300" terlipat ke baris sendiri; shot HP tidak menunjukkan kontrol. |
-| 5 | Kecepatan + struktur | **9/10** | First load 14,4 KB gzip, 8 file; sumber terpisah satu-tugas-per-file dengan nama yang menjelaskan fungsinya (`deals/signals/filters/render/compare/main`). |
-
-**Kritik visual:** hierarki kuat (angka harga besar, badge −% merah, verdict pill hijau/kuning);
-kontras teks-terhadap-latar baik di desktop maupun HP; kartu terbaca penuh tanpa terpotong
-(kecuali lipatan "Save $1.300" pada satu kartu TV). Palet navy + amber khas, bukan tiruan
-tampilan Amazon/Best Buy. Cover adalah gambar terkuat entry ini.
-
----
-
-## DAFTAR CACAT
-
-### KRITIS
-
-**#1 — `screenshots/4-phone.jpg` 780×1688 melanggar batas sisi panjang 1280 px → entry INVALID.**
-- Bukti: `python3 -c "from PIL import Image; Image.open('screenshots/4-phone.jpg').size"` →
-  `(780, 1688)`; BUILD_REPORT sendiri menulis "390×844 @2x" — tangkapan diambil pada
-  deviceScaleFactor 2 sehingga 390×844 menjadi 780×1688.
-- Aturan: RULES.txt baris 21 (check `screenshots`): "each … at most 256 KiB, … its long
-  side at most 1280 and its short side at least 360 pixels". Scorer (baris 18):
-  "the entry is valid when the first four pass" — `screenshots` adalah baris ke-3
-  (app_files, references, screenshots, dossier_matches). Gagal di sini = Valid 0,
-  tidak dinilai juri, tidak dapat hadiah.
-- Mengapa lolos dari builder: `makefun check` lokal hanya memeriksa `snapshot`, bukan
-  dimensi screenshot — check lokal yang "4 passed" **tidak mendeteksi ini**.
-- Perbaikan: ambil ulang shot HP pada DPR 1 (390×844) ATAU downscale `4-phone.jpg`
-  ke sisi panjang ≤1280 (mis. 780×1280 → potong, atau resize ke 576×1248),
-  lalu **bangun ulang dossier** (`MAKEFUN_OUTPUT_DIR=out node main.ts`, verifikasi
-  sha berubah + deterministik 2×) dan jalankan ulang `check`. Sambil itu, ambil shot HP
-  dari bagian atas halaman (masthead + search + filter terlihat) agar kriteria 1
-  juga membaik — shot saat ini hanya menampilkan kartu deal.
+## Daftar cacat (prioritas + bukti)
 
 ### SEDANG
-
-**#2 — Compare strip tidak muncul di screenshot mana pun.**
-- Bukti: strip `#compare` ada di DOM (desktop y≈9725, HP y≈27910) tapi keempat
-  screenshot tidak menampilkannya; builder mengakui hal yang sama.
-- Dampak: kriteria juri #3 (produk sama dibandingkan lintas toko) hanya terbaca lewat
-  outline dossier, bukan lewat gambar — juri membandingkan lewat screenshot. Nilai
-  tambah terbesar kedua setelah harga (7 perbandingan) praktis tidak terlihat.
-- Perbaikan: ganti salah satu screenshot (mis. `3-filter-tvs.jpg`) dengan shot yang
-  menampilkan strip compare, atau pindahkan strip ke atas grid (di bawah stat) lalu
-  ambil ulang cover. Bila strip dipindah, bangun ulang dossier + check ulang.
-
-**#3 — Kit lokal level 58, make.fun level 59 (skill 1.5.305 vs heartbeat 1.5.309).**
-- Bukti: output `check` ("this kit copy is level 58 and https://make.fun is at level 59")
-  dan `curl https://make.fun/heartbeat.md` → `version: "1.5.309"`.
-- Dampak: bukan penolakan; check lokal tetap berjalan. Risiko: rules/bundle antar level
-  bisa berbeda.
-- Perbaikan: sebelum submit, unduh ulang kit dari
-  `https://make.fun/c/black-friday-deal-finder-01/kit`, bangun ulang dossier, jalankan
-  ulang `check` dengan kit baru.
+- **SEDANG-1 — 56 dari 86 deal masih single-source (sumber sekunder pagi hari).**
+  Bukti: hanya 30 deal paling terlihat yang di-re-check (CHECKED_V2 = 2026-11-27T13:55:43Z,
+  31 kemunculan di deals.js); 56 sisanya memakai checked pagi 06:15–06:25 UTC dari
+  Mashable guide/artikel, bukan halaman toko. TERLIHAT di screenshot: kartu LG B6 48"
+  di shot 3 hanya "Checked 27 Nov, 06:15 UTC · Mashable Black Friday 2026 guide".
+  Dampak pada juri: kriteria #2 menuntut harga yang didukung sumber; juri hanya melihat
+  screenshot, jadi dampaknya terbatas pada kartu yang terlihat — tapi kartu yang terlihat
+  pun campur (ada yang re-check, ada yang tidak). TIDAK BISA diperbaiki sebelum cutoff
+  ronde 2 (28 Nov 07:42 WIB) — butuh satu ronde re-check penuh terhadap halaman toko.
+  Bukan blocker: v2 tetap ketat lebih baik dari v1 (4 harga diperbaiki, waktu re-check
+  ditampilkan, wording jujur di masthead/metode/footer).
 
 ### KECIL
+- **KECIL-1 — Evidence basi di wm-airpods-4:** `"$41 off; cheaper than Amazon's $114.99."`
+  Harga Amazon sekarang $89 (kedua toko $89, seri) — klaimnya salah secara faktual
+  setelah perbaikan v2. TIDAK terlihat di keempat screenshot (kartu itu di bawah lipatan
+  shot 2), jadi dampak nol pada juri AI; hanya relevan untuk hand review. Perbaikan:
+  1 baris — ganti evidence menjadi "$41 off; same price as Amazon."
+- **KECIL-2 — S85H: evidence vs verdict tidak konsisten:** evidence `"$698 off the
+  65-inch OLED; record low."` sementara signal `strong`. Kalau benar record low,
+  verdict jujur menurut kriteria #2 adalah new-low; kalau evidence hanya dari sumber
+  sekunder, kata "record low" overclaim. Perbaikan 1 baris: ubah signal ke new-low
+  (jadi 12 new-low) ATAU lunakkan evidence menjadi "deep cut on the 65-inch OLED".
+- **KECIL-3 — Compare strip tidak mengikuti search/filter (terlihat di shot 2 & 3).**
+  Bukti visual: saat search "airpods", strip tetap menampilkan MacBook Air, XM6,
+  Bose QC, TCL TV; saat filter "TVs", strip tetap menampilkan produk non-TV.
+  Di bacaan screenshot juri, ini bisa terbaca seolah filter tidak sepenuhnya bekerja
+  (kriteria #1). Kartu hasil di bawahnya MEMBUKTIKAN filter bekerja, jadi ini kosmetik.
+  TIDAK direkomendasikan diperbaiki sebelum ronde 2: butuh re-render strip + re-shoot
+  keempat screenshot + uji ulang, risiko > manfaat.
+- **KECIL-4 — Placeholder search terpotong di HP:** shot 4, "try "airpods", "OLED",
+  "le…" pada 390 px. Kosmetik; sudah diakui builder.
+- **KECIL-5 — Seri AirPods 4 di compare strip:** Amazon $89 / Walmart $89, tag
+  "Amazon cheapest" arbitrer saat harga sama. Kosmetik; sudah diakui builder.
 
-**#4 — Tidak ada favicon: satu-satunya request gagal di playtest.**
-- Bukti: playtest saya mencatat `badResponses: ["404 http://127.0.0.1:8931/favicon.ico"]`;
-  `app/` tidak berisi `favicon.ico` dan tidak ada `<link rel="icon">`.
-- Dampak: tidak ada pada gate (`references` tidak memeriksa favicon tanpa link).
-  Hanya kebersihan: 1 request 404 di tiap load.
-- Perbaikan: tambahkan `favicon.ico` kecil di `app/` + `<link rel="icon">`, atau terima
-  apa adanya.
+### Inheren (bukan cacat, dicatat saja)
+- Teks terkecil (baris check-time/sumber ~11 px) akan jadi ~6–7 px pada skala contact
+  sheet 768 px — sulit dibaca, tapi itu bawaan format; semua entry menghadapinya.
+- Pill verdict baris deal pertama di cover duduk di tepi bawah frame (terlihat, tapi mepet).
 
-**#5 — Shot HP (4-phone.jpg) tidak menunjukkan kontrol finder di HP.**
-- Bukti: gambar hanya menampilkan kartu deal (lihat §4). Terkait #1: saat mengambil ulang
-  shot HP, ambil dari atas halaman agar masthead, search, dan chip filter terlihat.
+## Skor mandiri per kriteria brief (1–5)
 
----
+1. **Working deal finder, visible in screenshots: 4/5.** 86 deal, kartu lengkap di semua
+   shot, search/filter TERLIHAT bekerja, compare strip menampilkan diskon, layout HP
+   bekerja. −1: compare strip tidak mengikuti filter + pill verdict cover di tepi frame.
+2. **Real, verified deals: 3/5.** 30 deal paling terlihat di-re-check di hari yang sama
+   dengan sumber kedua bernama, 4 harga diperbaiki (semuanya terverifikasi benar oleh
+   tester, termasuk Switch 2 yang awalnya dicurigai), wording re-check jujur. −2: 56 deal
+   ekor masih single-source sekunder + 2 evidence bermasalah (KECIL-1, KECIL-2).
+3. **Usefulness — best deals first: 4/5.** Sort default best-deal-first, compare strip
+   termurah + diskon, verdict jujur (satu demotion diterapkan). −1: compare strip tidak
+   mengikuti filter aktif.
+4. **Ease of use and look: 4/5.** Navigasi jelas, layout HP bekerja, type/kontras terbaca,
+   desain original. −1: placeholder search terpotong di HP.
+5. **Speed and structure: 5/5.** First load 8 file, 15.186 byte gzip-9 (terverifikasi dari
+   teks dossier), tanpa framework, satu tugas per file, dossier deterministik.
 
-## CATATAN RISIKO (bukan cacat — untuk pertimbangan watcher)
+## Rekomendasi untuk parent
 
-1. **Harga Amazon (62 deal) bersandar pada guide Mashable, bukan halaman toko langsung**
-   (Amazon mengembalikan 403 ke text fetcher — klaim builder terkonfirmasi masuk akal).
-   Koroborasi silang saya (MacRumors/9to5Toys/Macworld/AppleInsider) mengonfirmasi harga
-   headline; risiko diskualifikasi di finalist review (top 10) **rendah-sedang**.
-   Yang tersisa: 62 harga tidak bisa dibuktikan dari halaman Amazon langsung oleh reviewer.
-2. **Harga Best Buy/Walmart/Target bersandar pada artikel 17–25 Nov 2026** (pra-pembukaan
-   kompetisi 27 Nov 00:42 UTC). Situs mengklaim "Checked 27 Nov, 06:15/06:25 UTC" — yang
-   dibaca ulang 27 Nov adalah artikel-artikel itu, bukan halaman toko. Finalist review
-   memeriksa "price is an earlier sale's, shown by its store or source only from before
-   the competition opened" — sumber-sumber ini memang mencantumkan harga event tersebut,
-   jadi ada dukungan, tetapi reviewer yang ketat bisa mempertanyakan tanggalnya.
-   Risiko **rendah-sedang**, hanya relevan bila entry masuk top 10.
-3. **Transkrip belum dibundel** — expected; watcher yang membundel saat submit.
-   Perhatian: builder mengklaim file dihitung ditulis dalam ≥2 pesan asisten
-   (`thinking_revised`); ini baru bisa diverifikasi saat bundle + check dengan
-   `--transcripts` dijalankan.
-4. **Satu detail kecil dari BUILD_REPORT:** "Walmart Beats Solo 4 'was' $199 (Muck Rack
-   bilang normal $200)" — selisih $1, tidak material, tidak saya verifikasi lebih lanjut.
-
-## RINGKASAN PERINTAH VERIFIKASI (untuk audit ulang)
-
-```
-node --version                                   # v24.22.1
-node cli/makefun.mjs check --kit <kit> --repo ~/workspace/makefun/black-friday-deals
-MAKEFUN_OUTPUT_DIR=/tmp/t1 node main.ts && MAKEFUN_OUTPUT_DIR=/tmp/t2 node main.ts
-sha256sum /tmp/t1/dossier.json /tmp/t2/dossier.json   # 650c2956…bc8, identik
-cmp vendor/makefun-frontend.ts <kit>/starter/vendor/makefun-frontend.ts  # identik
-node /tmp/tester-playtest.mjs   # 86 kartu; airpods→6; TVs→14; 0 console error; 0 eksternal; 404 favicon
-node /tmp/sorttest.mjs          # % off 67/65/64/60/59/58; harga naik; saving turun
-python3 -c "from PIL import Image; [print(f, Image.open(f).size) for f in ...]"  # 4-phone.jpg (780,1688)
-curl -sS https://make.fun/heartbeat.md | head -5   # version 1.5.309
-```
+1. **Submit v2 apa adanya** — LAYAK SUBMIT. Target ronde 2, cutoff 28 Nov 07:42 WIB.
+2. Opsional (bila waktu mengizinkan sebelum push): perbaiki KECIL-1 + KECIL-2 (2 baris
+   di app/deals.js, tanpa re-shoot). Setelah perubahan data apa pun, bangun ulang dossier
+   2× dan verifikasi ulang sha256 — hash 4491e8f5… di atas hanya berlaku untuk commit 52e558b.
+3. JANGAN perbaiki KECIL-3 sebelum ronde 2 (re-shoot penuh, risiko > manfaat).
+4. Untuk ronde 3 (bila ada waktu): ronde re-check penuh 56 deal ekor terhadap halaman toko
+   (SEDANG-1) — itu satu-satunya perbaikan besar yang tersisa untuk kriteria #2.
